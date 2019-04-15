@@ -1,3 +1,4 @@
+package projecttwo;
 import java.util.Date; import java.util.Calendar;
 /**
  * Simple class holding the details of a real estate transaction.
