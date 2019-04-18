@@ -23,7 +23,7 @@ public class RealEstateSale {
   /**
    * Data-validating factory for RealEstateSale instances. 
    *
-   * @param country The 2-letter country code corresponding to the location of the sale.
+   * @param country The 3-letter country code corresponding to the location of the sale.
    * @param price The amount of the transaction.
    * @param year The year of the transaction.
    * @param month The month of the transaction.
@@ -46,6 +46,11 @@ public class RealEstateSale {
       price = 0.0;
     }
     if (!CurrencyConverter.countryCodes.contains(country)) {
+      country = null;
+      price = 0.0;
+      date = null;
+    }
+    if (price < 0.0) {
       country = null;
       price = 0.0;
       date = null;
