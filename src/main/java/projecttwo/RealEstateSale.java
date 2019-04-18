@@ -4,7 +4,7 @@ import java.util.Date; import java.util.Calendar;
  * Simple class holding the details of a real estate transaction.
  *
  * @author Sanford Wilson
- * @version 0.5
+ * @version 0.0.5
  */
 public class RealEstateSale {
   protected final String country;
