@@ -1,11 +1,13 @@
 package projecttwo;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.Locale;
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Utility class for CISC 3115. Uses a no-cost online currency conversion tool to convert values
@@ -20,8 +22,9 @@ public class CurrencyConverter {
     String[] locales = Locale.getISOCountries();
     countryCodes = new ArrayList<String>();
     for (String s : locales) {
-      Locale l = new Locale("en", s);
-      countryCodes.add(l.getISO3Country());
+      countryCodes.add(s);
+      //      Locale l = new Locale("en", s);
+      //      countryCodes.add(l.getISO3Country());
     }
   }
 
@@ -59,7 +62,9 @@ public class CurrencyConverter {
         Matcher matcher = pattern.matcher(jsonString);
         if (matcher.find()) {
           return Double.parseDouble(matcher.group()) * amount;
-        } else return null;
+        } else {
+          return null;
+        }
       }
       reader.close();
     } catch (Exception e) {

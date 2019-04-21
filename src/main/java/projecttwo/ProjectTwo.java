@@ -1,10 +1,11 @@
 package projecttwo;
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import java.util.ArrayList;
-import javax.swing.JList;
+
 import java.awt.BorderLayout;
 import java.text.DateFormat;
+import java.util.ArrayList;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
 
 public class ProjectTwo extends JFrame {
   private JList salesList;
@@ -12,6 +13,7 @@ public class ProjectTwo extends JFrame {
   private static DateFormat dateFormat = DateFormat.getDateInstance();
 
   private RealEstateSale[] data;
+
   public static void main(String[] args) {
     ProjectTwo gui = new ProjectTwo();
   }
@@ -46,7 +48,8 @@ public class ProjectTwo extends JFrame {
   }
   
   class RealEstateSaleListCellRenderer extends javax.swing.DefaultListCellRenderer {
-    public java.awt.Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+    public java.awt.Component getListCellRendererComponent(
+              JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
       super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
       if (value instanceof RealEstateSale) {
         RealEstateSale sale = (RealEstateSale) value;

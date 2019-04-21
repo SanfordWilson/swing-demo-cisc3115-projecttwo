@@ -1,5 +1,8 @@
 package projecttwo;
-import java.util.Date; import java.util.Calendar;
+
+import java.util.Calendar;
+import java.util.Date; 
+
 /**
  * Simple class holding the details of a real estate transaction.
  *
@@ -23,14 +26,14 @@ public class RealEstateSale {
   /**
    * Data-validating factory for RealEstateSale instances. 
    *
-   * @param country The 3-letter country code corresponding to the location of the sale.
+   * @param country The 2-letter country code corresponding to the location of the sale.
    * @param price The amount of the transaction.
    * @param year The year of the transaction.
    * @param month The month of the transaction.
    * @param day Day of the transaction.
    *
    * @return A new instance of RealEstateSale. If provided an invalid date or country code,
-   * all fields will be null/zero.
+   *      all fields will be null/zero.
    */
   public static RealEstateSale make(String country, double price, int year, int month, int day) {
     Calendar cal = Calendar.getInstance();
@@ -69,7 +72,7 @@ public class RealEstateSale {
   }
 
   /**
-   * Accessor for sale price
+   * Accessor for sale price.
    *
    * @return The amount of the transaction.
    */
