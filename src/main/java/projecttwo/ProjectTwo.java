@@ -4,9 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 /**
@@ -20,6 +22,7 @@ public class ProjectTwo extends JFrame {
   private JScrollPane scrollPane;
   private static DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG);
   private JLabel totalLabel;
+  private JPanel statsPane;
 
   private RealEstateSale[] data;
 
@@ -39,12 +42,16 @@ public class ProjectTwo extends JFrame {
     setupData();
     scrollPane = new JScrollPane();
     salesList = new JList(data);
+    statsPane = new JPanel();
     totalLabel = new JLabel("PLACEHOLDER TEXT");
 
     salesList.setCellRenderer(new RealEstateSaleListCellRenderer());
 
     add(scrollPane, BorderLayout.CENTER);
-    add(totalLabel, BorderLayout.EAST);
+    statsPane.setLayout(new BoxLayout(statsPane, BoxLayout.Y_AXIS));
+    statsPane.add(new JLabel("Total:"));
+    statsPane.add(totalLabel);
+    add(statsPane, BorderLayout.EAST);
     scrollPane.setViewportView(salesList);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setSize(500, 300);
