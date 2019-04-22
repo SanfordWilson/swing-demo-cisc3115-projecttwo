@@ -63,7 +63,7 @@ public class RealEstateSale {
   }
 
   /**
-   * Accessor for country code.
+   * Accesses country code.
    *
    * @return The 2-letter country code corresponding to the location of the sale.
    */
@@ -72,7 +72,7 @@ public class RealEstateSale {
   }
 
   /**
-   * Accessor for sale price.
+   * Accesses sale price.
    *
    * @return The amount of the transaction.
    */
@@ -81,7 +81,7 @@ public class RealEstateSale {
   }
 
   /**
-   * Accessor for sale date.
+   * Accesses sale date.
    *
    * @return Date object representing the Month, Day, and Year of the transaction.
    */
