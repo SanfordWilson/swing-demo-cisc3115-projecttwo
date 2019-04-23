@@ -18,7 +18,7 @@ import javax.swing.JScrollPane;
  * @version 0.1 4/21/19
  */
 public class ProjectTwo extends JFrame {
-  private JList salesList;
+  private JList<RealEstateSale> salesList;
   private JScrollPane scrollPane;
   private static DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG);
   private JLabel totalLabel;
@@ -41,7 +41,7 @@ public class ProjectTwo extends JFrame {
 
     setupData();
     scrollPane = new JScrollPane();
-    salesList = new JList(data);
+    salesList = new JList<RealEstateSale>(data);
     statsPane = new JPanel();
     totalLabel = new JLabel("PLACEHOLDER TEXT");
 
