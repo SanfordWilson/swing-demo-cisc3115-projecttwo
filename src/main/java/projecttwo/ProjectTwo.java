@@ -29,7 +29,7 @@ public class ProjectTwo extends JFrame {
   private static DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG);
 
   private JLabel totalLabel;
-  private JPanel statsPane;
+  private JPanel statsPanel;
   private JComboBox localeSelector;
   private JCheckBox currencyMatchingCheck;
   private JSpinner beginDateSelector;
@@ -53,16 +53,17 @@ public class ProjectTwo extends JFrame {
     setupData();
     scrollPane = new JScrollPane();
     salesList = new JList<RealEstateSale>(data);
-    statsPane = new JPanel();
+
+    statsPanel = new JPanel();
     totalLabel = new JLabel("PLACEHOLDER TEXT");
 
     salesList.setCellRenderer(new RealEstateSaleListCellRenderer());
 
     add(scrollPane, BorderLayout.CENTER);
-    statsPane.setLayout(new BoxLayout(statsPane, BoxLayout.Y_AXIS));
-    statsPane.add(new JLabel("Total:"));
-    statsPane.add(totalLabel);
-    add(statsPane, BorderLayout.EAST);
+    statsPanel.setLayout(new BoxLayout(statsPanel, BoxLayout.Y_AXIS));
+    statsPanel.add(new JLabel("Total:"));
+    statsPanel.add(totalLabel);
+    add(statsPanel, BorderLayout.EAST);
     scrollPane.setViewportView(salesList);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setSize(500, 300);
