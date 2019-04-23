@@ -32,8 +32,7 @@ public class RealEstateSale {
    * @param month The month of the transaction.
    * @param day Day of the transaction.
    *
-   * @return A new instance of RealEstateSale. If provided an invalid date or country code,
-   *      all fields will be null/zero.
+   * @return A new instance of RealEstateSale if fields are valid, otherwise returns null.
    */
   public static RealEstateSale make(String country, double price, int year, int month, int day) {
     Calendar cal = Calendar.getInstance();
@@ -45,18 +44,13 @@ public class RealEstateSale {
     try {
       date = cal.getTime();
     } catch (Exception e) {
-      country = null;
-      price = 0.0;
+      return null;
     }
     if (!CurrencyConverter.countryCodes.contains(country)) {
-      country = null;
-      price = 0.0;
-      date = null;
+      return null;
     }
     if (price < 0.0) {
-      country = null;
-      price = 0.0;
-      date = null;
+      return null;
     }
 
     return new RealEstateSale(country, price, date);

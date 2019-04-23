@@ -5,11 +5,15 @@ import java.awt.Font;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
 
 /**
  * Main program and GUI for real estate transaction summary program.
@@ -20,9 +24,16 @@ import javax.swing.JScrollPane;
 public class ProjectTwo extends JFrame {
   private JList<RealEstateSale> salesList;
   private JScrollPane scrollPane;
+  private JComboBox sortByBox;
+
   private static DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG);
+
   private JLabel totalLabel;
   private JPanel statsPane;
+  private JComboBox localeSelector;
+  private JCheckBox currencyMatchingCheck;
+  private JSpinner beginDateSelector;
+  private JSpinner endDateSelector;
 
   private RealEstateSale[] data;
 
@@ -76,7 +87,7 @@ public class ProjectTwo extends JFrame {
   private RealEstateSale getRandomSale() {
     ArrayList<String> codes = CurrencyConverter.countryCodes;
     RealEstateSale sale = null;
-    while (sale == null || sale.getCountry() == null) {
+    while (sale == null) {
       sale = RealEstateSale.make(
                   codes.get((int) (Math.random() * codes.size())), 
                   Math.random() * 5000000 + 75000,
@@ -111,7 +122,7 @@ public class ProjectTwo extends JFrame {
         RealEstateSale sale = (RealEstateSale) value;
         String date = dateFormat.format(sale.getDate());
 
-        setText(String.format("%3s | %18s | $%.2f", sale.getCountry(), date, sale.getPrice()));
+        setText(String.format("%3s | %18s | $%,.2f", sale.getCountry(), date, sale.getPrice()));
       }
       setFont(new Font("Courier New", Font.PLAIN, 14));
       return this;

@@ -49,18 +49,8 @@ class RealEstateSaleTest {
         protected RealEstateSale badSale = RealEstateSale.make("Invalid", 232.5, 1908, 1, 3);
 
         @Test
-        void countryShouldBeNull() {
-          assertNull(badSale.getCountry());
-        }
-
-        @Test
-        void priceShouldBeZero() {
-          assertEquals(badSale.getPrice(), 0.0);
-        }
-
-        @Test
-        void dateShouldBeNull() {
-          assertNull(badSale.getDate());
+        void shouldReturnNull() {
+          assertNull(badSale);
         }
       }
 
@@ -69,18 +59,8 @@ class RealEstateSaleTest {
         protected RealEstateSale badSale = RealEstateSale.make("US", 232.5, 1933, 1, 50);
 
         @Test
-        void countryShouldBeNull() {
-          assertNull(badSale.getCountry());
-        }
-
-        @Test
-        void priceShouldBeZero() {
-          assertEquals(badSale.getPrice(), 0.0);
-        }
-
-        @Test
-        void dateShouldBeNull() {
-          assertNull(badSale.getDate());
+        void shouldReturnNull() {
+          assertNull(badSale);
         }
       }
 
@@ -89,18 +69,8 @@ class RealEstateSaleTest {
         protected RealEstateSale badSale = RealEstateSale.make("US", -4322.3, 2008, 3, 13);
 
         @Test
-        void countryShouldBeNull() {
-          assertNull(badSale.getCountry());
-        }
-
-        @Test
-        void priceShouldBeZero() {
-          assertEquals(badSale.getPrice(), 0.0);
-        }
-
-        @Test
-        void dateShouldBeNull() {
-          assertNull(badSale.getDate());
+        void shouldReturnNull() {
+          assertNull(badSale);
         }
       }
     }
