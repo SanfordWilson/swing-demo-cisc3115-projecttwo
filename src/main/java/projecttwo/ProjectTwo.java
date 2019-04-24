@@ -211,4 +211,25 @@ public class ProjectTwo extends JFrame {
       return this;
     }
   }
+
+  class DateComparator<RealEstateSale> implements java.util.Comparator<RealEstateSale> {
+
+    public int compare(RealEstateSale one, RealEstateSale two) {
+      return one.getDate().compareTo(two);
+    }
+  }
+
+  class CountryComparator<RealEstateSale> implements java.util.Comparator<RealEstateSale> {
+
+    public int compare(RealEstateSale one, RealEstateSale two) {
+      return one.getCountry().compareTo(two);
+    }
+  }
+
+  class PriceComparator<RealEstateSale> implements java.util.Comparator<RealEstateSale> {
+
+    public int compare(RealEstateSale one, RealEstateSale two) {
+      return one.getPrice() - two.getPrice()
+    }
+  }
 }
