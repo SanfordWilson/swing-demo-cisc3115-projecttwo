@@ -74,12 +74,12 @@ public class ProjectTwo extends JFrame {
    * Creates and shapes south views.
    */
   private void setupSouthView() {
-    JPanel southPanel = new JPanel();
     creationDatePicker = new JSpinner(new javax.swing.SpinnerDateModel());
     DefaultComboBoxModel<String> localeSelectorModel = new DefaultComboBoxModel();
     localeSelectorModel.addAll(CurrencyConverter.countryCodes);
     creationCountrySelector = new JComboBox(localeSelectorModel);
     creationPriceField = new JTextField(20);
+    JPanel southPanel = new JPanel();
     southPanel.add(creationDatePicker);
     southPanel.add(creationPriceField);
     southPanel.add(creationCountrySelector);
@@ -92,7 +92,8 @@ public class ProjectTwo extends JFrame {
   private void updateTotal() {
     double total = 0.0;
     for (RealEstateSale sale : data) {
-      total += sale.getPrice();
+      total += CurrencyConverter.currConvert(
+          CurrencyConverter.getCurrency(sale.getCountry()).toString(), "USD", sale.getPrice());
     }
     totalLabel.setText(String.format("$%,.2f", total));
   }
@@ -205,31 +206,31 @@ public class ProjectTwo extends JFrame {
         RealEstateSale sale = (RealEstateSale) value;
         String date = dateFormat.format(sale.getDate());
 
-        setText(String.format("%3s | %18s | $%,.2f", sale.getCountry(), date, sale.getPrice()));
+        setText(String.format("%3s | %18s | %,.2f", sale.getCountry(), date, sale.getPrice()));
       }
       setFont(new Font("Courier New", Font.PLAIN, 14));
       return this;
     }
   }
 
-  class DateComparator<RealEstateSale> implements java.util.Comparator<RealEstateSale> {
+  class DateComparator implements java.util.Comparator<RealEstateSale> {
 
     public int compare(RealEstateSale one, RealEstateSale two) {
-      return one.getDate().compareTo(two);
+      return one.getDate().compareTo(two.getDate());
     }
   }
 
-  class CountryComparator<RealEstateSale> implements java.util.Comparator<RealEstateSale> {
+  class CountryComparator implements java.util.Comparator<RealEstateSale> {
 
     public int compare(RealEstateSale one, RealEstateSale two) {
-      return one.getCountry().compareTo(two);
+      return one.getCountry().compareTo(two.getCountry());
     }
   }
 
-  class PriceComparator<RealEstateSale> implements java.util.Comparator<RealEstateSale> {
+  class PriceComparator implements java.util.Comparator<RealEstateSale> {
 
     public int compare(RealEstateSale one, RealEstateSale two) {
-      return one.getPrice() - two.getPrice()
+      return (int) (one.getPrice() - two.getPrice());
     }
   }
 }

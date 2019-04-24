@@ -51,7 +51,7 @@ public class CurrencyConverter {
    * @param amount currency amount to be converted
    * @return value of amount, expressed in "to" currency
    */
-  public static Double currConvert(String from, String to, int amount) {
+  public static Double currConvert(String from, String to, double amount) {
 
     try {
       URL url = new URL("https://api.exchangeratesapi.io/latest?base=" + from + "&symbols=" + to);
