@@ -5,6 +5,9 @@ import java.awt.Font;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -22,20 +25,25 @@ import javax.swing.JTextField;
  * @version 0.1 4/21/19
  */
 public class ProjectTwo extends JFrame {
-  private JList<RealEstateSale> salesList;
-  private JScrollPane scrollPane;
-  private JComboBox sortByBox;
-
+  private DefaultListModel<RealEstateSale> listModel;
   private static DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG);
 
-  private JLabel totalLabel;
-  private JPanel statsPanel;
   private JComboBox localeSelector;
+
+  private JLabel totalLabel;
+  private JComboBox countryFilter;
+  
+  private JComboBox sortByBox;
   private JCheckBox currencyMatchingCheck;
   private JSpinner beginDateSelector;
   private JSpinner endDateSelector;
 
-  private RealEstateSale[] data;
+  private JSpinner creationDatePicker;
+  private JTextField creationPriceField;
+  private JComboBox creationCountrySelector;
+  private JButton submit;
+
+  private ArrayList<RealEstateSale> data;
 
   /**
    * Entry point for program execution.
@@ -51,32 +59,106 @@ public class ProjectTwo extends JFrame {
     super("Sales Records");
 
     setupData();
-    scrollPane = new JScrollPane();
-    salesList = new JList<RealEstateSale>(data);
+    setupNorthView();
+    setupCenterView();
+    setupEastView();
+    setupSouthView();
+    updateTotal();
 
-    statsPanel = new JPanel();
-    totalLabel = new JLabel("PLACEHOLDER TEXT");
-
-    salesList.setCellRenderer(new RealEstateSaleListCellRenderer());
-
-    add(scrollPane, BorderLayout.CENTER);
-    statsPanel.setLayout(new BoxLayout(statsPanel, BoxLayout.Y_AXIS));
-    statsPanel.add(new JLabel("Total:"));
-    statsPanel.add(totalLabel);
-    add(statsPanel, BorderLayout.EAST);
-    scrollPane.setViewportView(salesList);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setSize(500, 300);
     setVisible(true);
+  }
+  
+  /**
+   * Creates and shapes south views.
+   */
+  private void setupSouthView() {
+    JPanel southPanel = new JPanel();
+    creationDatePicker = new JSpinner(new javax.swing.SpinnerDateModel());
+    DefaultComboBoxModel<String> localeSelectorModel = new DefaultComboBoxModel();
+    localeSelectorModel.addAll(CurrencyConverter.countryCodes);
+    creationCountrySelector = new JComboBox(localeSelectorModel);
+    creationPriceField = new JTextField(20);
+    southPanel.add(creationDatePicker);
+    southPanel.add(creationPriceField);
+    southPanel.add(creationCountrySelector);
+    submit = new JButton("Create New");
+    southPanel.add(submit);
+
+    add(southPanel, BorderLayout.SOUTH);
+  }
+    
+  private void updateTotal() {
+    double total = 0.0;
+    for (RealEstateSale sale : data) {
+      total += sale.getPrice();
+    }
+    totalLabel.setText(String.format("$%,.2f", total));
+  }
+
+  /**
+   * Creates and shapes east views.
+   */
+  private void setupEastView() {
+    totalLabel = new JLabel("PLACEHOLDER TEXT");
+
+    beginDateSelector = new JSpinner(new javax.swing.SpinnerDateModel());
+    endDateSelector = new JSpinner(new javax.swing.SpinnerDateModel());
+    JPanel spinnerPanel = new JPanel();
+    spinnerPanel.add(beginDateSelector);
+    spinnerPanel.add(endDateSelector);
+    JPanel statsPanel = new JPanel();
+    statsPanel.setLayout(new BoxLayout(statsPanel, BoxLayout.Y_AXIS));
+    statsPanel.add(spinnerPanel);
+    statsPanel.add(new JLabel("Total:"));
+    statsPanel.add(totalLabel);
+    add(statsPanel, BorderLayout.EAST);
+  }
+
+  /**
+   * Creates and shapes center views.
+   */
+  private void setupCenterView() {
+    listModel = new DefaultListModel<RealEstateSale>();
+    JList<RealEstateSale> salesList = new JList<RealEstateSale>(listModel);
+    listModel.addAll(data);
+    salesList.setCellRenderer(new RealEstateSaleListCellRenderer());
+    
+    JPanel optionsPanel = new JPanel();
+    currencyMatchingCheck = new JCheckBox("Convert from local currency");
+    optionsPanel.add(currencyMatchingCheck);
+
+    JScrollPane scrollPane = new JScrollPane();
+    JPanel centerPanel = new JPanel();
+    centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+    centerPanel.add(optionsPanel);
+    centerPanel.add(scrollPane);
+    scrollPane.setViewportView(salesList);
+    add(centerPanel, BorderLayout.CENTER);
+  }
+
+  /**
+   * Creates and shapes north views.
+   */
+  private void setupNorthView() {
+    DefaultComboBoxModel<String> localeSelectorModel = new DefaultComboBoxModel();
+    localeSelectorModel.addAll(CurrencyConverter.countryCodes);
+    localeSelector = new JComboBox(localeSelectorModel);
+
+    JPanel northPanel = new JPanel();
+    northPanel.setLayout(new BoxLayout(northPanel, BoxLayout.Y_AXIS));
+    northPanel.add(localeSelector);
+    add(northPanel, BorderLayout.NORTH);
   }
 
   /**
    * Instantializes 'data' to an array of 20 random RealEstateSales.
    */
   private void setupData() {
-    data = new RealEstateSale[20];
+    data = new ArrayList<RealEstateSale>();
     for (int i = 0; i < 20; i++) {
-      data[i] = getRandomSale();
+      data.add(getRandomSale());
     }
   }
 
