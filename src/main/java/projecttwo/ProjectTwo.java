@@ -206,7 +206,7 @@ public class ProjectTwo extends JFrame {
         RealEstateSale sale = (RealEstateSale) value;
         String date = dateFormat.format(sale.getDate());
 
-        setText(String.format("%3s | %18s | %,.2f", sale.getCountry(), date, sale.getPrice()));
+        setText(String.format("%3s | %18s | %,13.2f", sale.getCountry(), date, sale.getPrice()));
       }
       setFont(new Font("Courier New", Font.PLAIN, 14));
       return this;

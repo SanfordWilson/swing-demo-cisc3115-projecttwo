@@ -19,7 +19,7 @@ public class CurrencyConverter {
   /* intialize countryCodes */
 
   static {
-    String[] locales = Locale.getISOCountries();
+    String[] locales = {"AD", "AS", "AT", "AX", "BE", "BL", "BQ", "CA", "CY", "DE", "EC", "EE", "ES", "FI", "FM", "FR", "GF", "GP", "GR", "GU", "IE", "IO", "IS", "IT", "LT", "LU", "LV", "MC", "ME", "MF", "MH", "MP", "MQ", "MT", "NL", "PM", "PR", "PT", "PW", "RE", "SI", "SK", "SM", "TC", "TF", "TL", "UM", "US", "VA", "VG", "VI", "YT"};
     countryCodes = new ArrayList<String>();
     for (String s : locales) {
       countryCodes.add(s);
