@@ -47,6 +47,8 @@ public class ProjectTwo extends JFrame {
 
   /**
    * Entry point for program execution.
+   *
+   * @param args Not used.
    */
   public static void main(String[] args) {
     ProjectTwo gui = new ProjectTwo();

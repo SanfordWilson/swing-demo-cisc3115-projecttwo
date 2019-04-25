@@ -15,7 +15,11 @@ public class RealEstateSale {
   protected final Date date;
 
   /**
-   * Naive constructor.
+   * Creates an instance of RealEstateSale from pre-verified values.
+   *
+   * @param country The 2-letter country code corresponding to the location of the sale.
+   * @param price The amount of the transaction in local currency.
+   * @param date Date object representing the year, month, and day the sale occured.
    */
   protected RealEstateSale(String country, double price, Date date) {
     this.country = country;

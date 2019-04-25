@@ -13,6 +13,8 @@ public class ValidCurrenciesGenerator {
   /**
    * Prints a nearly copy/paste-able list of country codes corresponding to convertible currencies
    *  found in 'CurrencyConverter.countryCodes'.
+   *
+   * @param args Not used.
    */
   public static void main(String[] args) {
     ArrayList<String> validCodes = new ArrayList<String>();
