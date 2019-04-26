@@ -22,7 +22,8 @@ public class ValidCurrenciesGenerator {
     for (int i = 0; i < CurrencyConverter.countryCodes.size(); i++) {
       try {
         String country = CurrencyConverter.countryCodes.get(i);
-        double val = CurrencyConverter.currConvert(CurrencyConverter.getCurrency(country) + "", "USD", 1.0);
+        double val = 
+           CurrencyConverter.currConvert(CurrencyConverter.getCurrency(country) + "", "USD", 1.0);
         val += 2.2;
         validCodes.add(country);
       } catch (Exception e) {

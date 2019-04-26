@@ -4,6 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -24,11 +27,11 @@ import javax.swing.JTextField;
  * @author Sanford Wilson
  * @version 0.1 4/21/19
  */
-public class ProjectTwo extends JFrame {
-  private DefaultListModel<RealEstateSale> listModel;
-  private static DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG);
+public final class ProjectTwo extends JFrame {
 
+  private ProgramModel model;
   private JComboBox localeSelector;
+  private DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG);
 
   private JLabel totalLabel;
   private JComboBox countryFilter;
@@ -43,7 +46,6 @@ public class ProjectTwo extends JFrame {
   private JComboBox creationCountrySelector;
   private JButton submit;
 
-  private ArrayList<RealEstateSale> data;
 
   /**
    * Entry point for program execution.
@@ -59,24 +61,26 @@ public class ProjectTwo extends JFrame {
    */
   private ProjectTwo() {
     super("Sales Records");
+    model = new ProgramModel();
 
-    setupData();
     setupNorthView();
     setupCenterView();
     setupEastView();
     setupSouthView();
-    updateTotal();
+    updateTotalLabel();
 
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setSize(500, 300);
     setVisible(true);
   }
-  
+
   /**
    * Creates and shapes south views.
    */
   private void setupSouthView() {
-    creationDatePicker = new JSpinner(new javax.swing.SpinnerDateModel());
+    creationDatePicker = new JSpinner(new javax.swing.SpinnerDateModel(
+          model.getEndDate(), null, model.getEndDate(), Calendar.DAY_OF_MONTH));
+
     DefaultComboBoxModel<String> localeSelectorModel = new DefaultComboBoxModel();
     localeSelectorModel.addAll(CurrencyConverter.countryCodes);
     creationCountrySelector = new JComboBox(localeSelectorModel);
@@ -91,14 +95,6 @@ public class ProjectTwo extends JFrame {
     add(southPanel, BorderLayout.SOUTH);
   }
     
-  private void updateTotal() {
-    double total = 0.0;
-    for (RealEstateSale sale : data) {
-      total += CurrencyConverter.currConvert(
-          CurrencyConverter.getCurrency(sale.getCountry()).toString(), "USD", sale.getPrice());
-    }
-    totalLabel.setText(String.format("$%,.2f", total));
-  }
 
   /**
    * Creates and shapes east views.
@@ -106,8 +102,14 @@ public class ProjectTwo extends JFrame {
   private void setupEastView() {
     totalLabel = new JLabel("PLACEHOLDER TEXT");
 
-    beginDateSelector = new JSpinner(new javax.swing.SpinnerDateModel());
-    endDateSelector = new JSpinner(new javax.swing.SpinnerDateModel());
+    Calendar cal = Calendar.getInstance();
+    cal.set(1980, 0, 1);
+    Date earliestDate = cal.getTime();
+    Date endDate = model.getEndDate();
+    beginDateSelector = new JSpinner(
+        new javax.swing.SpinnerDateModel(earliestDate, null, endDate, Calendar.DAY_OF_MONTH));
+    endDateSelector = new JSpinner(
+        new javax.swing.SpinnerDateModel(endDate, earliestDate, endDate, Calendar.DAY_OF_MONTH));
     JPanel spinnerPanel = new JPanel();
     spinnerPanel.add(beginDateSelector);
     spinnerPanel.add(endDateSelector);
@@ -123,9 +125,7 @@ public class ProjectTwo extends JFrame {
    * Creates and shapes center views.
    */
   private void setupCenterView() {
-    listModel = new DefaultListModel<RealEstateSale>();
-    JList<RealEstateSale> salesList = new JList<RealEstateSale>(listModel);
-    listModel.addAll(data);
+    JList<RealEstateSale> salesList = new JList<RealEstateSale>(model.getListModel());
     salesList.setCellRenderer(new RealEstateSaleListCellRenderer());
     
     JPanel optionsPanel = new JPanel();
@@ -155,34 +155,10 @@ public class ProjectTwo extends JFrame {
     add(northPanel, BorderLayout.NORTH);
   }
 
-  /**
-   * Instantializes 'data' to an array of 20 random RealEstateSales.
-   */
-  private void setupData() {
-    data = new ArrayList<RealEstateSale>();
-    for (int i = 0; i < 20; i++) {
-      data.add(getRandomSale());
-    }
-  }
 
-  /**
-   * Generates a random, valid RealEstateSale.
-   *
-   * @return an instance of RealEstateSale with valid fields
-   */
-  private RealEstateSale getRandomSale() {
-    ArrayList<String> codes = CurrencyConverter.countryCodes;
-    RealEstateSale sale = null;
-    while (sale == null) {
-      sale = RealEstateSale.make(
-                  codes.get((int) (Math.random() * codes.size())), 
-                  Math.random() * 5000000 + 75000,
-                  (int) (Math.random() * 20) + 1998,
-                  (int) (Math.random() * 12),
-                  (int) (Math.random() * 31) + 1
-              );
-    }
-    return sale;
+  
+  private void updateTotalLabel() {
+    totalLabel.setText(String.format("$%,.2f", model.getTotal()));
   }
 
   /**
