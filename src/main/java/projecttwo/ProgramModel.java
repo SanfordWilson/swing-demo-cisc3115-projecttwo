@@ -5,10 +5,9 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
-import javax.swing.DefaultListModel;
 
 public class ProgramModel {
-  private DefaultListModel<RealEstateSale> listModel;
+  private ArrayList<RealEstateSale> sales;
   private Locale userLocale;
   
   private Date beginDate;
@@ -29,8 +28,8 @@ public class ProgramModel {
     return total;
   }
 
-  public DefaultListModel<RealEstateSale> getListModel() {
-    return listModel;
+  public ArrayList<RealEstateSale> getSales() {
+    return sales;
   }
 
   private void setupDates() {
@@ -38,15 +37,16 @@ public class ProgramModel {
     cal.set(1980, 0, 1);
     beginDate = cal.getTime();
     endDate = now;
+    userLocale = Locale.getDefault();
     
-    listModel = new DefaultListModel<RealEstateSale>();
-    listModel.addAll(makeTestData());
+    sales = new ArrayList<RealEstateSale>();
+    sales.addAll(makeTestData());
     updateTotal();
   }
 
   private void updateTotal() {
     double newTotal = 0.0;
-    for (RealEstateSale sale : Collections.list(listModel.elements())) {
+    for (RealEstateSale sale : sales) {
       if (sale.getDate().compareTo(beginDate) >= 0 && sale.getDate().compareTo(endDate) <= 1) {
         newTotal += CurrencyConverter.currConvert(
             CurrencyConverter.getCurrency(sale.getCountry()).toString(), "USD", sale.getPrice());

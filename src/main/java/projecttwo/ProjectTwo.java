@@ -3,9 +3,7 @@ package projecttwo;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -125,7 +123,9 @@ public final class ProjectTwo extends JFrame {
    * Creates and shapes center views.
    */
   private void setupCenterView() {
-    JList<RealEstateSale> salesList = new JList<RealEstateSale>(model.getListModel());
+    DefaultListModel listModel = new DefaultListModel<RealEstateSale>();
+    listModel.addAll(model.getSales());
+    JList<RealEstateSale> salesList = new JList<RealEstateSale>(listModel);
     salesList.setCellRenderer(new RealEstateSaleListCellRenderer());
     
     JPanel optionsPanel = new JPanel();
