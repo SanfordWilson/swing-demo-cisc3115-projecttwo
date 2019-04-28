@@ -26,7 +26,11 @@ import javax.swing.JTextField;
  * Main program and GUI for real estate transaction summary program.
  *
  * @author Sanford Wilson
- * @version 0.1 4/21/19
+ * @version 0.5 4/26/19
+ * @since 0.2
+ *
+ * @see ProgramModel
+ * @see RealEstateSale
  */
 public final class ProjectTwo extends JFrame implements java.util.Observer {
 
@@ -79,14 +83,30 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     setVisible(true);
   }
 
+  /**
+   * Responds to changes in the model. Updates the displayed total and, if necessary, the
+   *  'DefaultListModel' for the displayed list of sales.
+   *
+   *  @param o The sending object, should be the model.
+   *  @param arg Optional object sent by 'o'. If arg is a collection, 'listModel' will be updated
+   *    to reflect the contents of 'arg'.
+   */
   public void update(Observable o, Object arg) {
     if (arg instanceof java.util.Collection) {
-      listModel.clear();
-      listModel.addAll((java.util.Collection<RealEstateSale>) arg);
+      java.util.Collection<RealEstateSale> updatedSales;
+      try {
+        updatedSales = (java.util.Collection<RealEstateSale>) arg;
+        listModel.clear();
+        listModel.addAll(updatedSales);
+      } catch (ClassCastException e) {
+      }
     }
     updateTotalLabel();
   }
 
+  /**
+   * Creates and adds instances of appropriate listeners to GUI elements.
+   */
   private void attachListeners() {
     beginDateSelector.addChangeListener(new BeginDateListener());
     endDateSelector.addChangeListener(new EndDateListener());
@@ -176,6 +196,9 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
   }
 
   
+  /**
+   * Sets the text of 'totalLabel' to reflict the current total value in the model.
+   */
   private void updateTotalLabel() {
     totalLabel.setText(String.format("$%,.2f", model.getTotal()));
   }
@@ -210,34 +233,87 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     }
   }
 
+  /**
+   * Listener for manipulation of the model's beginning date.
+   */
   private class BeginDateListener implements ChangeListener {
+
+    /**
+     * Sets the model's beginning date to the currently displayed value of 'beginDateSelector'.
+     *
+     * @param event unused
+     */
     public void stateChanged(ChangeEvent event) {
       model.setBeginDate((Date) beginDateSelector.getValue());
     }
   }
 
+  /**
+   * Listener for manipulation of the model's ending date.
+   */
   private class EndDateListener implements ChangeListener {
+
+    /**
+     * Sets th emodel's ending date to the currently displayed date of 'endDateSelector'.
+     */
     public void stateChanged(ChangeEvent event) {
       model.setEndDate((Date) endDateSelector.getValue());
     }
   }
 
+  /**
+   * Allows comparison of 'RealEstateSale' instances by their 'Date'.
+   */
   class DateComparator implements java.util.Comparator<RealEstateSale> {
 
+    /**
+     * Compares 'RealEstateSale' instances by the values of their respective 'getDate()' methods.
+     *
+     * @param one The first sale to compare
+     * @param two The second sale for comparison
+     *
+     * @return An int less than 0 if 'one' has a lesser 'Date' than 'two', 0 if both dates 
+     *  are equal, or an int greater than 0 if 'one' has a greater 'Date' than 'two'.
+     */
     public int compare(RealEstateSale one, RealEstateSale two) {
       return one.getDate().compareTo(two.getDate());
     }
   }
 
+  /**
+   * Allows comparison of 'RealEstateSale' instances by country.
+   */
   class CountryComparator implements java.util.Comparator<RealEstateSale> {
 
+    /**
+     * Compares 'RealEstateSale' instances by the value of their respective 'getCountry()' methods.
+     *
+     * @param one The first sale to compare
+     * @param two The second sale to compare
+     *
+     * @return The result of the comparison of the returns of the 'getCountry' method of each
+     *  RealEstateSale according to the natural sorting order of those values.
+     */
     public int compare(RealEstateSale one, RealEstateSale two) {
       return one.getCountry().compareTo(two.getCountry());
     }
   }
 
+  /**
+   * Allows comparison of 'RealEstateSale' instances by price.
+   */
   class PriceComparator implements java.util.Comparator<RealEstateSale> {
 
+    /**
+     * Compares 'RealEstateSale' instances by the value of their respective 'getPrice()' methods.
+     *   ***Does not currently account for differently valued currencies***
+     *
+     * @param one The first sale to compare
+     * @param two The second sale to compare
+     *
+     * @return The result of the comparison of the returns of the 'getPrice' method of each
+     *  RealEstateSale according to the natural sorting order of those values.
+     */
     public int compare(RealEstateSale one, RealEstateSale two) {
       return (int) (one.getPrice() - two.getPrice());
     }

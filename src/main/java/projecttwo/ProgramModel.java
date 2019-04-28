@@ -7,6 +7,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
+/**
+ * Model for a collection of 'RealEstateSale' instances and their totals converted to a common 
+ *  currency and filterd by beginning and end dates.
+ *
+ *  @author Sanford Wilson
+ *  @version 0.5 4/26/19
+ *  @since 0.5
+ *
+ *  @see RealEstateSale
+ */
 public class ProgramModel extends java.util.Observable {
   private ArrayList<RealEstateSale> sales;
   private HashMap<RealEstateSale, Double> convertedPrices;
