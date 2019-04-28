@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
-public class ProgramModel {
+public class ProgramModel extends java.util.Observable {
   private ArrayList<RealEstateSale> sales;
+  private HashMap<RealEstateSale, Double> convertedPrices;
   private Locale userLocale;
   
   private Date beginDate;
@@ -17,7 +19,7 @@ public class ProgramModel {
   private double total;
 
   public ProgramModel() {
-    setupDates();
+    setup();
   }
 
   public Date getEndDate() {
@@ -32,29 +34,61 @@ public class ProgramModel {
     return sales;
   }
 
-  private void setupDates() {
+  public void setUserLocale(Locale locale) {
+    if (userLocale != locale) {
+      userLocale = locale;
+      String currencyCode = CurrencyConverter.getCurrency(locale.getCountry()).toString();
+      convertedPrices = new HashMap<RealEstateSale, Double>();
+      for (RealEstateSale sale : sales) {
+        convertedPrices.put(sale, CurrencyConverter.currConvert(
+              CurrencyConverter.getCurrency(sale.getCountry()).toString(), currencyCode, sale.getPrice()));
+      }
+      setChanged();
+      notifyObservers();
+    }
+  }
+
+  public void setBeginDate(Date date) {
+    beginDate = date;
+    updateTotal();
+    setChanged();
+    notifyObservers();
+  }
+
+  public void setEndDate(Date date) {
+    endDate = date;
+    updateTotal();
+    setChanged();
+    notifyObservers();
+  }
+
+  public void addSale(RealEstateSale sale) {
+    sales.add(sale);
+    updateTotal();
+    setChanged();
+    notifyObservers(sales);
+  }
+
+  private void setup() {
     Calendar cal = Calendar.getInstance();
     cal.set(1980, 0, 1);
     beginDate = cal.getTime();
     endDate = now;
-    userLocale = Locale.getDefault();
     
     sales = new ArrayList<RealEstateSale>();
     sales.addAll(makeTestData());
+    setUserLocale(Locale.getDefault());
     updateTotal();
   }
 
   private void updateTotal() {
     double newTotal = 0.0;
     for (RealEstateSale sale : sales) {
-      if (sale.getDate().compareTo(beginDate) >= 0 && sale.getDate().compareTo(endDate) <= 1) {
-        newTotal += CurrencyConverter.currConvert(
-            CurrencyConverter.getCurrency(sale.getCountry()).toString(), "USD", sale.getPrice());
+      if (sale.getDate().compareTo(beginDate) >= 0 && sale.getDate().compareTo(endDate) <= 0) {
+        newTotal += convertedPrices.get(sale);
       }
     }
-    if (newTotal != total) {
-      total = newTotal;
-    }
+    total = newTotal;
   }
   
   /**

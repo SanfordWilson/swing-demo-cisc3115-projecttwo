@@ -5,9 +5,12 @@ import java.awt.Font;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Observable;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -25,12 +28,14 @@ import javax.swing.JTextField;
  * @author Sanford Wilson
  * @version 0.1 4/21/19
  */
-public final class ProjectTwo extends JFrame {
+public final class ProjectTwo extends JFrame implements java.util.Observer {
 
   private ProgramModel model;
   private JComboBox localeSelector;
   private DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG);
 
+  private JList<RealEstateSale> salesList;
+  private DefaultListModel<RealEstateSale> listModel;
   private JLabel totalLabel;
   private JComboBox countryFilter;
   
@@ -60,16 +65,31 @@ public final class ProjectTwo extends JFrame {
   private ProjectTwo() {
     super("Sales Records");
     model = new ProgramModel();
+    model.addObserver(this);
 
     setupNorthView();
     setupCenterView();
     setupEastView();
     setupSouthView();
     updateTotalLabel();
+    attachListeners();
 
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    setSize(500, 300);
+    setSize(800, 500);
     setVisible(true);
+  }
+
+  public void update(Observable o, Object arg) {
+    if (arg instanceof java.util.Collection) {
+      listModel.clear();
+      listModel.addAll((java.util.Collection<RealEstateSale>) arg);
+    }
+    updateTotalLabel();
+  }
+
+  private void attachListeners() {
+    beginDateSelector.addChangeListener(new BeginDateListener());
+    endDateSelector.addChangeListener(new EndDateListener());
   }
 
   /**
@@ -123,9 +143,9 @@ public final class ProjectTwo extends JFrame {
    * Creates and shapes center views.
    */
   private void setupCenterView() {
-    DefaultListModel listModel = new DefaultListModel<RealEstateSale>();
+    listModel = new DefaultListModel<RealEstateSale>();
     listModel.addAll(model.getSales());
-    JList<RealEstateSale> salesList = new JList<RealEstateSale>(listModel);
+    salesList = new JList<RealEstateSale>(listModel);
     salesList.setCellRenderer(new RealEstateSaleListCellRenderer());
     
     JPanel optionsPanel = new JPanel();
@@ -154,7 +174,6 @@ public final class ProjectTwo extends JFrame {
     northPanel.add(localeSelector);
     add(northPanel, BorderLayout.NORTH);
   }
-
 
   
   private void updateTotalLabel() {
@@ -188,6 +207,18 @@ public final class ProjectTwo extends JFrame {
       }
       setFont(new Font("Courier New", Font.PLAIN, 14));
       return this;
+    }
+  }
+
+  private class BeginDateListener implements ChangeListener {
+    public void stateChanged(ChangeEvent event) {
+      model.setBeginDate((Date) beginDateSelector.getValue());
+    }
+  }
+
+  private class EndDateListener implements ChangeListener {
+    public void stateChanged(ChangeEvent event) {
+      model.setEndDate((Date) endDateSelector.getValue());
     }
   }
 
