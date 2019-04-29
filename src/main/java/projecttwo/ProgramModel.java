@@ -78,6 +78,12 @@ public class ProgramModel extends java.util.Observable {
 
   public void addSale(RealEstateSale sale) {
     sales.add(sale);
+    String currencyCode = CurrencyConverter.getCurrency(userLocale.getCountry()).toString();
+    convertedPrices.put(sale, CurrencyConverter.currConvert(
+        CurrencyConverter.getCurrency(
+            sale.getCountry()).toString(), currencyCode, sale.getPrice()
+        )
+    );
     updateTotal();
     setChanged();
     notifyObservers(sales);

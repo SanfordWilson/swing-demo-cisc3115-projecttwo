@@ -19,6 +19,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -71,6 +73,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     model = new ProgramModel();
     model.addObserver(this);
 
+    //TODO Layout views better
     setupNorthView();
     setupCenterView();
     setupEastView();
@@ -111,6 +114,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
   private void attachListeners() {
     beginDateSelector.addChangeListener(new BeginDateListener());
     endDateSelector.addChangeListener(new EndDateListener());
+    submit.addActionListener(new EntryCreationListener());
   }
 
   /**
@@ -259,6 +263,25 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
      */
     public void stateChanged(ChangeEvent event) {
       model.setEndDate((Date) endDateSelector.getValue());
+    }
+  }
+
+  private class EntryCreationListener implements ActionListener {
+
+    public void actionPerformed(ActionEvent event) {
+      RealEstateSale sale = null;
+      try {
+        sale = RealEstateSale.make(
+            (String) creationCountrySelector.getSelectedItem(),
+            Double.parseDouble(creationPriceField.getText()), 
+            (Date) creationDatePicker.getValue()
+        );
+      } catch (Exception e) {
+        //do nothing
+      }
+      if (sale != null) {
+        model.addSale(sale);
+      }
     }
   }
 
