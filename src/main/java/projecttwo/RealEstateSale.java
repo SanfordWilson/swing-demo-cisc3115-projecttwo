@@ -61,6 +61,23 @@ public class RealEstateSale {
   }
 
   /**
+   * Data-validating factory for RealEstateSale instances.
+   *
+   * @param country The 2-letter country code corresponding to the location of the sale.
+   * @param price The amount of the transaction.
+   * @param date The date of the transaction.
+   * 
+   * @return A new instance of RealEstateSale if fields are valid, otherwise returns null.
+   */
+  public static RealEstateSale make(String country, double price, Date date) {
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(date);
+
+    return make(country, price, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE));
+  }
+
+    
+  /**
    * Accesses country code.
    *
    * @return The 2-letter country code corresponding to the location of the sale.
@@ -86,5 +103,4 @@ public class RealEstateSale {
   public Date getDate() {
     return date;
   }
-
 }

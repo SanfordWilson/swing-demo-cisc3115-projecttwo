@@ -9,8 +9,6 @@ import java.util.Observable;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -21,6 +19,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  * Main program and GUI for real estate transaction summary program.
@@ -89,7 +89,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
    *
    *  @param o The sending object, should be the model.
    *  @param arg Optional object sent by 'o'. If arg is a collection, 'listModel' will be updated
-   *    to reflect the contents of 'arg'.
+   *      to reflect the contents of 'arg'.
    */
   public void update(Observable o, Object arg) {
     if (arg instanceof java.util.Collection) {
@@ -99,6 +99,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
         listModel.clear();
         listModel.addAll(updatedSales);
       } catch (ClassCastException e) {
+        // Then the listModel should not be updated
       }
     }
     updateTotalLabel();
@@ -273,7 +274,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
      * @param two The second sale for comparison
      *
      * @return An int less than 0 if 'one' has a lesser 'Date' than 'two', 0 if both dates 
-     *  are equal, or an int greater than 0 if 'one' has a greater 'Date' than 'two'.
+     *     are equal, or an int greater than 0 if 'one' has a greater 'Date' than 'two'.
      */
     public int compare(RealEstateSale one, RealEstateSale two) {
       return one.getDate().compareTo(two.getDate());
@@ -292,7 +293,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
      * @param two The second sale to compare
      *
      * @return The result of the comparison of the returns of the 'getCountry' method of each
-     *  RealEstateSale according to the natural sorting order of those values.
+     *     RealEstateSale according to the natural sorting order of those values.
      */
     public int compare(RealEstateSale one, RealEstateSale two) {
       return one.getCountry().compareTo(two.getCountry());
@@ -312,7 +313,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
      * @param two The second sale to compare
      *
      * @return The result of the comparison of the returns of the 'getPrice' method of each
-     *  RealEstateSale according to the natural sorting order of those values.
+     *     RealEstateSale according to the natural sorting order of those values.
      */
     public int compare(RealEstateSale one, RealEstateSale two) {
       return (int) (one.getPrice() - two.getPrice());

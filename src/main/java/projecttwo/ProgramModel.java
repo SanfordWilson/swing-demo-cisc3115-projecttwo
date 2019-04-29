@@ -16,6 +16,7 @@ import java.util.Locale;
  *  @since 0.5
  *
  *  @see RealEstateSale
+ *  @see java.util.Observable
  */
 public class ProgramModel extends java.util.Observable {
   private ArrayList<RealEstateSale> sales;
@@ -51,7 +52,10 @@ public class ProgramModel extends java.util.Observable {
       convertedPrices = new HashMap<RealEstateSale, Double>();
       for (RealEstateSale sale : sales) {
         convertedPrices.put(sale, CurrencyConverter.currConvert(
-              CurrencyConverter.getCurrency(sale.getCountry()).toString(), currencyCode, sale.getPrice()));
+              CurrencyConverter.getCurrency(
+                  sale.getCountry()).toString(), currencyCode, sale.getPrice()
+              )
+        );
       }
       setChanged();
       notifyObservers();
