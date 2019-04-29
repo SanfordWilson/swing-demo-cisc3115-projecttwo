@@ -276,11 +276,17 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
             Double.parseDouble(creationPriceField.getText()), 
             (Date) creationDatePicker.getValue()
         );
-      } catch (Exception e) {
+        if (sale != null) {
+          model.addSale(sale);
+          creationDatePicker.setValue(new Date());
+          creationPriceField.setText("");
+        }
+      } catch (NumberFormatException e) {
         //do nothing
-      }
-      if (sale != null) {
-        model.addSale(sale);
+      } catch (NullPointerException e) {
+        //do nothing
+      } catch (ClassCastException e) {
+        //also do nothing
       }
     }
   }
