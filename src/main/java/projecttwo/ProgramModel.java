@@ -45,6 +45,10 @@ public class ProgramModel extends java.util.Observable {
     return sales;
   }
 
+  public Locale getUserLocale() {
+    return userLocale;
+  }
+
   public void setUserLocale(Locale locale) {
     if (userLocale != locale) {
       userLocale = locale;

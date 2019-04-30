@@ -3,8 +3,10 @@ package projecttwo;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Observable;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -205,7 +207,17 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
    * Sets the text of 'totalLabel' to reflict the current total value in the model.
    */
   private void updateTotalLabel() {
-    totalLabel.setText(String.format("$%,.2f", model.getTotal()));
+    totalLabel.setText(formatForLocale(model.getTotal(), model.getUserLocale()));
+  }
+
+  private String formatForLocale(double amount, String countryCode) {
+    Locale locale = new Locale("en", countryCode);
+    return formatForLocale(amount, locale);
+  }
+
+  private String formatForLocale(double amount, Locale locale) {
+    NumberFormat formatter = NumberFormat.getCurrencyInstance(locale);
+    return formatter.format(amount);
   }
 
   /**
@@ -231,7 +243,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
         RealEstateSale sale = (RealEstateSale) value;
         String date = dateFormat.format(sale.getDate());
 
-        setText(String.format("%3s | %18s | %,13.2f", sale.getCountry(), date, sale.getPrice()));
+        setText(String.format("%3s | %18s | %15s", sale.getCountry(), date, formatForLocale(sale.getPrice(), sale.getCountry())));
       }
       setFont(new Font("Courier New", Font.PLAIN, 14));
       return this;
@@ -259,7 +271,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
   private class EndDateListener implements ChangeListener {
 
     /**
-     * Sets th emodel's ending date to the currently displayed date of 'endDateSelector'.
+     * Sets the model's ending date to the currently displayed date of 'endDateSelector'.
      */
     public void stateChanged(ChangeEvent event) {
       model.setEndDate((Date) endDateSelector.getValue());
