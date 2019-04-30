@@ -23,6 +23,8 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -117,6 +119,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     beginDateSelector.addChangeListener(new BeginDateListener());
     endDateSelector.addChangeListener(new EndDateListener());
     submit.addActionListener(new EntryCreationListener());
+    currencyMatchingCheck.addItemListener(new ConvertAllPricesListener());
   }
 
   /**
@@ -250,6 +253,23 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     }
   }
 
+  class RealEstateSaleListCellRendererConvertedCurrencies extends javax.swing.DefaultListCellRenderer {
+
+    public java.awt.Component getListCellRendererComponent(
+              JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+      super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+      if (value instanceof RealEstateSale) {
+        RealEstateSale sale = (RealEstateSale) value;
+        String date = dateFormat.format(sale.getDate());
+
+        setText(String.format("%3s | %18s | %15s", sale.getCountry(), date, formatForLocale(model.getConvertedPrice(sale), model.getUserLocale())));
+      }
+      setFont(new Font("Courier New", Font.PLAIN, 14));
+      return this;
+    }
+  }
+
+
   /**
    * Listener for manipulation of the model's beginning date.
    */
@@ -358,6 +378,19 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
      */
     public int compare(RealEstateSale one, RealEstateSale two) {
       return (int) (one.getPrice() - two.getPrice());
+    }
+  }
+
+  class ConvertAllPricesListener implements ItemListener {
+
+    public void itemStateChanged(ItemEvent event) {
+      javax.swing.DefaultListCellRenderer renderer;
+      if (event.getStateChange() == ItemEvent.SELECTED) {
+        renderer = new RealEstateSaleListCellRendererConvertedCurrencies();
+      } else {
+        renderer = new RealEstateSaleListCellRenderer();
+      }
+      salesList.setCellRenderer(renderer);
     }
   }
 }

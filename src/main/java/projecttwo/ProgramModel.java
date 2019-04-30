@@ -49,6 +49,14 @@ public class ProgramModel extends java.util.Observable {
     return userLocale;
   }
 
+  public double getConvertedPrice(RealEstateSale sale) {
+    if (convertedPrices.containsKey(sale)) {
+      return convertedPrices.get(sale);
+    } else {
+      return 0.0;
+    }
+  }
+
   public void setUserLocale(Locale locale) {
     if (userLocale != locale) {
       userLocale = locale;
