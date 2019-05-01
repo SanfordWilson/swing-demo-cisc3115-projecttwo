@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Currency;
+import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -80,5 +82,68 @@ public class CurrencyConverter {
       }
       return null;
     }
+  }
+
+  /**
+   * Highly brittle funciton that uses an online currency conversion API.
+   *
+   * <p>See https://exchangeratesapi.io/ for more info.
+   *
+   * @param from ISO currency code representing currency of amount.
+   * @param to ISO currency code representing target currency
+   * @param amount currency amount to be converted
+   * @param date the date the exchange rate should referenced to.
+   * @return value of amount, expressed in "to" currency using the exchange rate at the time
+   *     of date.
+   */
+  public static Double currConvert(String from, String to, double amount, Date date) {
+    if (from.equals(to)) {
+      return amount;    //avoids possible 400 error for same currencies
+    } else {
+      Calendar cal = Calendar.getInstance();
+      cal.setTime(date);
+      String endDateString = stringify(cal);
+      cal.add(Calendar.DATE, -1);
+      String beginDateString = stringify(cal);
+      try {
+        URL url = new URL(
+            "https://api.exchangeratesapi.io/history?start_at=" + beginDateString + "&end_at=" 
+            + endDateString + "&base=" + from + "&symbols=" + to);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+        String jsonString = reader.readLine();
+        if (jsonString.length() > 0) {
+          Pattern pattern = Pattern.compile("\\d+\\.\\d*");
+          Matcher matcher = pattern.matcher(jsonString);
+          if (matcher.find()) {
+            return Double.parseDouble(matcher.group()) * amount;
+          } else {
+            return null;
+          }
+        }
+        reader.close();
+      } catch (Exception e) {
+        System.out.println(e.getMessage());
+      }
+      return null;
+    }
+  }
+
+  private static String stringify(Calendar cal) {
+    int month = cal.get(Calendar.MONTH);
+    int date = cal.get(Calendar.DATE);
+    month++;
+    String monthString;
+    String dateString;
+    if (month < 10) {
+      monthString = "0" + month;
+    } else {
+      monthString = "" + month;
+    }
+    if (date < 10) {
+      dateString = "0" + date;
+    } else {
+      dateString = "" + date;
+    }
+    return cal.get(Calendar.YEAR) + "-" + monthString + "-" + dateString;
   }
 }

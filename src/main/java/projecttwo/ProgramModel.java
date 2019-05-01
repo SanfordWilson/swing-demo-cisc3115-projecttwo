@@ -22,6 +22,7 @@ public class ProgramModel extends java.util.Observable {
   private ArrayList<RealEstateSale> sales;
   private HashMap<RealEstateSale, Double> convertedPrices;
   private Locale userLocale;
+  private boolean historical = false;
   
   private Date beginDate;
   private Date endDate;
@@ -113,18 +114,27 @@ public class ProgramModel extends java.util.Observable {
   public void setUserLocale(Locale locale) {
     if (userLocale != locale) {
       userLocale = locale;
-      String currencyCode = CurrencyConverter.getCurrency(locale.getCountry()).toString();
-      convertedPrices = new HashMap<RealEstateSale, Double>();
-      for (RealEstateSale sale : sales) {
-        convertedPrices.put(sale, CurrencyConverter.currConvert(
-              CurrencyConverter.getCurrency(
-                  sale.getCountry()).toString(), currencyCode, sale.getPrice()
-              )
-        );
-      }
+      generateConvertedPrices();
       updateTotal();
       setChanged();
       notifyObservers(locale);
+    }
+  }
+  
+  /**
+   * Sets the property for using historical exchange rates in calculations.
+   *
+   * <p>Causes all prices and total to be re-calculated and cached, notifies observers.
+   *
+   * @param toSet the new state of historical
+   */
+  public void setHistorical(boolean toSet) {
+    if (historical != toSet) {
+      historical = toSet;
+      generateConvertedPrices();
+      updateTotal();
+      setChanged();
+      notifyObservers();
     }
   }
 
@@ -166,12 +176,7 @@ public class ProgramModel extends java.util.Observable {
    */
   public void addSale(RealEstateSale sale) {
     sales.add(sale);
-    String currencyCode = CurrencyConverter.getCurrency(userLocale.getCountry()).toString();
-    convertedPrices.put(sale, CurrencyConverter.currConvert(
-        CurrencyConverter.getCurrency(
-            sale.getCountry()).toString(), currencyCode, sale.getPrice()
-        )
-    );
+    convertedPrices.put(sale, convertPrice(sale, historical));
     updateTotal();
     setChanged();
     notifyObservers(sale);
@@ -236,5 +241,33 @@ public class ProgramModel extends java.util.Observable {
               );
     }
     return sale;
+  }
+
+  private double convertPrice(RealEstateSale sale, boolean historical) {
+    double price = 0.0;
+    String currencyCode = CurrencyConverter.getCurrency(userLocale.getCountry()).toString();
+    if (historical) {
+      try {
+        price = CurrencyConverter.currConvert(
+          CurrencyConverter.getCurrency(
+              sale.getCountry()).toString(), currencyCode, sale.getPrice(), sale.getDate()
+          );
+      } catch (NullPointerException e) {
+        return convertPrice(sale, false);
+      }
+    } else {
+      price = CurrencyConverter.currConvert(
+      CurrencyConverter.getCurrency(
+          sale.getCountry()).toString(), currencyCode, sale.getPrice()
+      );
+    }
+    return price;
+  }
+
+  private void generateConvertedPrices() {
+    convertedPrices = new HashMap<RealEstateSale, Double>();
+    for (RealEstateSale sale : sales) {
+      convertedPrices.put(sale, convertPrice(sale, historical));
+    }
   }
 }

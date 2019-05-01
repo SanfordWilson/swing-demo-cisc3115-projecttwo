@@ -54,6 +54,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
   
   private JComboBox sortByBox;
   private JCheckBox currencyMatchingCheck;
+  private JCheckBox historicalCheck;
   private JSpinner beginDateSelector;
   private JSpinner endDateSelector;
 
@@ -81,7 +82,6 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     model.addObserver(this);
 
     createComponents();
-    //TODO Improve layout
     setupNorthView();
     setupCenterView();
     setupEastView();
@@ -89,6 +89,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     attachListeners();
 
     updateTotalLabel();
+    setDateSpinnerFormats(dateFormat);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setSize(800, 500);
     setVisible(true);
@@ -110,14 +111,20 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     updateTotalLabel();
   }
 
+  /**
+   * Coordinates instantiation of interactive GUI components.
+   */
   private void createComponents() {
-    createNewEntryComponents();
     createDateFilterComponents();
+    createNewEntryComponents();
     totalLabel = new JLabel("PLACEHOLDER TEXT");
     setupList();
     createViewingOptionComponents();
   }
 
+  /**
+   * Handles instantiation of the interactive components involved in new entry creation.
+   */
   private void createNewEntryComponents() {
     creationDatePicker = new JSpinner(new javax.swing.SpinnerDateModel(
           model.getEndDate(), null, model.getEndDate(), Calendar.DAY_OF_MONTH));
@@ -128,6 +135,9 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     submit = new JButton("Create New");
   }
 
+  /**
+   * Handles instantiation of interactive components involved in filtering dates for total.
+   */
   private void createDateFilterComponents() {
     Calendar cal = Calendar.getInstance();
     cal.set(1980, 0, 1);
@@ -139,6 +149,9 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
         new javax.swing.SpinnerDateModel(endDate, earliestDate, endDate, Calendar.DAY_OF_MONTH));
   }
 
+  /**
+   * Handles instantiation of components involved in displaying list of RealEstateSales.
+   */
   private void setupList() {
     listModel = new DefaultListModel<RealEstateSale>();
     listModel.addAll(model.getSales());
@@ -147,13 +160,18 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     salesList.setCellRenderer(new RealEstateSaleListCellRenderer());
   }
 
+  /**
+   * Handles instantiation of components involved in setting viewing options for list.
+   */
   private void createViewingOptionComponents() {
-    currencyMatchingCheck = new JCheckBox("Convert from local currency");
+    currencyMatchingCheck = new JCheckBox("Convert from local currency:");
     DefaultComboBoxModel<String> localeSelectorModel = new DefaultComboBoxModel();
     localeSelectorModel.addAll(CurrencyConverter.countryCodes);
     localeSelector = new JComboBox(localeSelectorModel);
     localeSelector.setSelectedItem(model.getUserLocale().getCountry());
     localeSelector.setEditable(false);
+
+    historicalCheck = new JCheckBox("Use historical exchange rates when available:");
 
     DefaultComboBoxModel<Comparator> sortByModel = new DefaultComboBoxModel(
         new Comparator[] {new DateComparator(), new PriceComparator(), new CountryComparator()});
@@ -172,6 +190,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     currencyMatchingCheck.addItemListener(new ConvertAllPricesListener());
     sortByBox.addItemListener(new SortingListener());
     localeSelector.addItemListener(new LocaleSelectionListener());
+    historicalCheck.addItemListener(new HistoricalListener());
   }
 
   /**
@@ -230,6 +249,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     JPanel northPanel = new JPanel();
     northPanel.setLayout(new BoxLayout(northPanel, BoxLayout.Y_AXIS));
     northPanel.add(localeSelector);
+    northPanel.add(historicalCheck);
     add(northPanel, BorderLayout.NORTH);
   }
 
@@ -241,16 +261,47 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     totalLabel.setText(formatForLocale(model.getTotal(), model.getUserLocale()));
   }
 
+  /**
+   * Provides a formatted string to properly display amount in local style for the currency of
+   *    specified country.
+   *
+   * <p>Includes appropriate currency symbol. 
+   *
+   * @param amount the amount of currency
+   * @param countryCode 2-letter code for the country.
+   *
+   * @return formatted String for locale-correct display of amount in the appropriate currency
+   */
   private String formatForLocale(double amount, String countryCode) {
     Locale locale = new Locale("en", countryCode);
     return formatForLocale(amount, locale);
   }
 
+  /**
+   * Provides a formatted String to properly display in local style amount
+   *    in the currency of locale.
+   *
+   * <p>Includes appropriate currency symbol. 
+   *
+   * @param amount the number to be formatted
+   * @param locale the Locale of the desired currency
+   *
+   * @return formatted String for locale-correct display of amount in the appropriate currency
+   *
+   * @see Locale
+   */
   private String formatForLocale(double amount, Locale locale) {
     NumberFormat formatter = NumberFormat.getCurrencyInstance(locale);
     return formatter.format(amount);
   }
 
+  /**
+   * Sorts entries in main display list by the provided method.
+   *
+   * @param sortMethod the Comparator used to determine sort order
+   *
+   * @see Comparator
+   */
   private void sortListBy(Comparator<RealEstateSale> sortMethod) {
     java.util.ArrayList<RealEstateSale> tempList = Collections.list(listModel.elements());
     Collections.sort(tempList, sortMethod);
@@ -258,6 +309,17 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     listModel.addAll(tempList);
   }
 
+  /**
+   * Provides a best-guess locale for a given country code.
+   *
+   * <p>Uses jdk-provided constants when available.
+   *
+   * @param country The 2-letter country code of the desired country
+   *
+   * @return a best-guess instance of Locale
+   *
+   * @see Locale
+   */
   private Locale bestLocaleFor(String country) {
     Locale bestGuess;
     switch (country) {
@@ -298,6 +360,24 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
   }
 
   /**
+   * Updates the formats of all JSpinners displaying dates.
+   *
+   * @param dateFormat the new format to use
+   *
+   * @see DateFormat
+   */
+  private void setDateSpinnerFormats(DateFormat dateFormat) {
+    try {
+      String format = ((java.text.SimpleDateFormat) dateFormat).toLocalizedPattern();
+      beginDateSelector.setEditor(new JSpinner.DateEditor(beginDateSelector, format));
+      endDateSelector.setEditor(new JSpinner.DateEditor(endDateSelector, format));
+      creationDatePicker.setEditor(new JSpinner.DateEditor(creationDatePicker, format));
+    } catch (ClassCastException e) {
+      //keep the current format
+    }
+  }
+
+  /**
    * Custom ListCellRenderer for proper display of RealEstateSale values.
    */
   class RealEstateSaleListCellRenderer extends DefaultListCellRenderer {
@@ -321,16 +401,32 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
         String date = dateFormat.format(sale.getDate());
 
         setText(String.format("%3s | %18s | %15s", 
-              sale.getCountry(), date, formatForLocale(sale.getPrice(), bestLocaleFor(sale.getCountry()))
-              ));
+              sale.getCountry(), date, 
+              formatForLocale(sale.getPrice(), bestLocaleFor(sale.getCountry()))
+            ));
       }
       setFont(new Font("Courier New", Font.PLAIN, 14));
       return this;
     }
   }
 
+  /**
+   * Custom ListCellRenderer for proper display of RealEstateSale values with prices converted
+   *    to the user's currency.
+   */
   class RealEstateSaleListCellRendererConvertedCurrencies extends DefaultListCellRenderer {
 
+    /**
+     * Formats a cell for proper display of RealEstateSale objects.
+     *
+     * @param list The JList consumer of cells.
+     * @param value The RealEstateSale associated with the cell.
+     * @param index The index of value in list's model.
+     * @param isSelected Selection status of cell to be rendered.
+     * @param cellHasFocus Focus status of cell to be rendered.
+     *
+     * @return The properly formatted cell.
+     */
     public java.awt.Component getListCellRendererComponent(
               JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
       super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
@@ -373,14 +469,24 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
 
     /**
      * Sets the model's ending date to the currently displayed date of 'endDateSelector'.
+     * @param event unused
      */
     public void stateChanged(ChangeEvent event) {
       model.setEndDate((Date) endDateSelector.getValue());
     }
   }
 
+  /**
+   * Listener for new entry creation. Adds a new entry to the model and restes fields.
+   */
   private class EntryCreationListener implements ActionListener {
 
+    /**
+     * Creates and adds a new RealEstateSale to the model and resets entry fields
+     *    if fields contain valid information.
+     *
+     * @param event unused
+     */
     public void actionPerformed(ActionEvent event) {
       RealEstateSale sale = null;
       try {
@@ -456,14 +562,13 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
   class PriceComparator implements Comparator<RealEstateSale> {
 
     /**
-     * Compares 'RealEstateSale' instances by the value of their respective 'getPrice()' methods.
-     *   ***Does not currently account for differently valued currencies***
+     * Compares 'RealEstateSale' instances by the value of their respective prices under the 
+     *    current currency conversion model.
      *
      * @param one The first sale to compare
      * @param two The second sale to compare
      *
-     * @return The result of the comparison of the returns of the 'getPrice' method of each
-     *     RealEstateSale according to the natural sorting order of those values.
+     * @return The result of the comparison of the RealEstateSales converted prices.
      */
     public int compare(RealEstateSale one, RealEstateSale two) {
       return (int) (model.getConvertedPrice(one) - model.getConvertedPrice(two));
@@ -474,8 +579,16 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     }
   }
 
+  /**
+   * Listener for toggling display of converted prices in list.
+   */
   class ConvertAllPricesListener implements ItemListener {
 
+    /**
+     * Sets the conversion display mode.
+     *
+     * @param event reflects the state of the item pressed
+     */
     public void itemStateChanged(ItemEvent event) {
       DefaultListCellRenderer renderer;
       if (event.getStateChange() == ItemEvent.SELECTED) {
@@ -487,18 +600,39 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     }
   }
 
+  /**
+   * Listener for selection of sorting order.
+   */
   class SortingListener implements ItemListener {
     public void itemStateChanged(ItemEvent event) {
       sortListBy((Comparator<RealEstateSale>)sortByBox.getSelectedItem());
     }
   }
 
+  /**
+   * Listener for selection of user's preferred locale.
+   */
   class LocaleSelectionListener implements ItemListener {
     public void itemStateChanged(ItemEvent event) {
       String country = (String) localeSelector.getSelectedItem();
       Locale toSet = bestLocaleFor(country);
       model.setUserLocale(toSet);
+      dateFormat = DateFormat.getDateInstance(DateFormat.LONG, toSet);
+      setDateSpinnerFormats(dateFormat);
       salesList.repaint();
+    }
+  }
+
+  /**
+   * Listener for toggling historic or current exchange rates.
+   */
+  class HistoricalListener implements ItemListener {
+    public void itemStateChanged(ItemEvent event) {
+      if (event.getStateChange() == ItemEvent.SELECTED) {
+        model.setHistorical(true);
+      } else {
+        model.setHistorical(false);
+      }
     }
   }
 }
