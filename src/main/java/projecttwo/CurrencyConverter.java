@@ -57,24 +57,27 @@ public class CurrencyConverter {
    * @return value of amount, expressed in "to" currency
    */
   public static Double currConvert(String from, String to, double amount) {
-
-    try {
-      URL url = new URL("https://api.exchangeratesapi.io/latest?base=" + from + "&symbols=" + to);
-      BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-      String jsonString = reader.readLine();
-      if (jsonString.length() > 0) {
-        Pattern pattern = Pattern.compile("\\d+\\.\\d*");
-        Matcher matcher = pattern.matcher(jsonString);
-        if (matcher.find()) {
-          return Double.parseDouble(matcher.group()) * amount;
-        } else {
-          return null;
+    if (from.equals(to)) {
+      return amount;    //avoids possible 400 error for same currencies
+    } else {
+      try {
+        URL url = new URL("https://api.exchangeratesapi.io/latest?base=" + from + "&symbols=" + to);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+        String jsonString = reader.readLine();
+        if (jsonString.length() > 0) {
+          Pattern pattern = Pattern.compile("\\d+\\.\\d*");
+          Matcher matcher = pattern.matcher(jsonString);
+          if (matcher.find()) {
+            return Double.parseDouble(matcher.group()) * amount;
+          } else {
+            return null;
+          }
         }
+        reader.close();
+      } catch (Exception e) {
+        System.out.println(e.getMessage());
       }
-      reader.close();
-    } catch (Exception e) {
-      System.out.println(e.getMessage());
+      return null;
     }
-    return null;
   }
 }

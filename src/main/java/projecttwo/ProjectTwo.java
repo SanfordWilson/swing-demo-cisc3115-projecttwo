@@ -258,6 +258,45 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     listModel.addAll(tempList);
   }
 
+  private Locale bestLocaleFor(String country) {
+    Locale bestGuess;
+    switch (country) {
+      case "CA":
+        bestGuess = Locale.CANADA;
+        break;
+      case "CN":
+        bestGuess = Locale.CHINA;
+        break;
+      case "FR":
+        bestGuess = Locale.FRANCE;
+        break;
+      case "DE":
+        bestGuess = Locale.GERMANY;
+        break;
+      case "IT":
+        bestGuess = Locale.ITALY;
+        break;
+      case "JP":
+        bestGuess = Locale.JAPAN;
+        break;
+      case "KR":
+        bestGuess = Locale.KOREA;
+        break;
+      case "TW":
+        bestGuess = Locale.TAIWAN;
+        break;
+      case "US":
+        bestGuess = Locale.US;
+        break;
+      case "UK":
+        bestGuess = Locale.UK;
+        break;
+      default:
+        bestGuess = new Locale("en", country);
+    }
+    return bestGuess;
+  }
+
   /**
    * Custom ListCellRenderer for proper display of RealEstateSale values.
    */
@@ -457,42 +496,9 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
   class LocaleSelectionListener implements ItemListener {
     public void itemStateChanged(ItemEvent event) {
       String country = (String) localeSelector.getSelectedItem();
-      Locale toSet;
-      switch (country) {
-        case "CA":
-          toSet = Locale.CANADA;
-          break;
-        case "CN":
-          toSet = Locale.CHINA;
-          break;
-        case "FR":
-          toSet = Locale.FRANCE;
-          break;
-        case "DE":
-          toSet = Locale.GERMANY;
-          break;
-        case "IT":
-          toSet = Locale.ITALY;
-          break;
-        case "JP":
-          toSet = Locale.JAPAN;
-          break;
-        case "KR":
-          toSet = Locale.KOREA;
-          break;
-        case "TW":
-          toSet = Locale.TAIWAN;
-          break;
-        case "US":
-          toSet = Locale.US;
-          break;
-        case "UK":
-          toSet = Locale.UK;
-          break;
-        default:
-          toSet = new Locale("en", country);
-      }
+      Locale toSet = bestLocaleFor(country);
       model.setUserLocale(toSet);
+      salesList.repaint();
     }
   }
 }
