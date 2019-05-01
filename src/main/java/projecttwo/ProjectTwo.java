@@ -171,6 +171,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     submit.addActionListener(new EntryCreationListener());
     currencyMatchingCheck.addItemListener(new ConvertAllPricesListener());
     sortByBox.addItemListener(new SortingListener());
+    localeSelector.addItemListener(new LocaleSelectionListener());
   }
 
   /**
@@ -450,6 +451,48 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
   class SortingListener implements ItemListener {
     public void itemStateChanged(ItemEvent event) {
       sortListBy((Comparator<RealEstateSale>)sortByBox.getSelectedItem());
+    }
+  }
+
+  class LocaleSelectionListener implements ItemListener {
+    public void itemStateChanged(ItemEvent event) {
+      String country = (String) localeSelector.getSelectedItem();
+      Locale toSet;
+      switch (country) {
+        case "CA":
+          toSet = Locale.CANADA;
+          break;
+        case "CN":
+          toSet = Locale.CHINA;
+          break;
+        case "FR":
+          toSet = Locale.FRANCE;
+          break;
+        case "DE":
+          toSet = Locale.GERMANY;
+          break;
+        case "IT":
+          toSet = Locale.ITALY;
+          break;
+        case "JP":
+          toSet = Locale.JAPAN;
+          break;
+        case "KR":
+          toSet = Locale.KOREA;
+          break;
+        case "TW":
+          toSet = Locale.TAIWAN;
+          break;
+        case "US":
+          toSet = Locale.US;
+          break;
+        case "UK":
+          toSet = Locale.UK;
+          break;
+        default:
+          toSet = new Locale("en", country);
+      }
+      model.setUserLocale(toSet);
     }
   }
 }
