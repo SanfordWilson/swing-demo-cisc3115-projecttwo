@@ -98,7 +98,7 @@ public class ProgramModel extends java.util.Observable {
     );
     updateTotal();
     setChanged();
-    notifyObservers(sales);
+    notifyObservers(sale);
   }
 
   private void setup() {

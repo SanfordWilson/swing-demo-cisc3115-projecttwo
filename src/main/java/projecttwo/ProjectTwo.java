@@ -5,6 +5,8 @@ import java.awt.Font;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Observable;
@@ -77,14 +79,16 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     model = new ProgramModel();
     model.addObserver(this);
 
-    //TODO Layout views better
+    createComponents();
+    //TODO Improve layout
     setupNorthView();
     setupCenterView();
     setupEastView();
     setupSouthView();
-    updateTotalLabel();
     attachListeners();
 
+    updateTotalLabel();
+    sortByBox.setSelectedIndex(0);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setSize(800, 500);
     setVisible(true);
@@ -99,17 +103,61 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
    *      to reflect the contents of 'arg'.
    */
   public void update(Observable o, Object arg) {
-    if (arg instanceof java.util.Collection) {
-      java.util.Collection<RealEstateSale> updatedSales;
-      try {
-        updatedSales = (java.util.Collection<RealEstateSale>) arg;
-        listModel.clear();
-        listModel.addAll(updatedSales);
-      } catch (ClassCastException e) {
-        // Then the listModel should not be updated
-      }
+    if (arg instanceof RealEstateSale) {
+      listModel.addElement((RealEstateSale) arg);
+      sortListBy((Comparator<RealEstateSale>)sortByBox.getSelectedItem());
     }
     updateTotalLabel();
+  }
+
+  private void createComponents() {
+    createNewEntryComponents();
+    createDateFilterComponents();
+    totalLabel = new JLabel("PLACEHOLDER TEXT");
+    setupList();
+    createViewingOptionComponents();
+  }
+
+  private void createNewEntryComponents() {
+    creationDatePicker = new JSpinner(new javax.swing.SpinnerDateModel(
+          model.getEndDate(), null, model.getEndDate(), Calendar.DAY_OF_MONTH));
+    DefaultComboBoxModel<String> localeSelectorModel = new DefaultComboBoxModel();
+    localeSelectorModel.addAll(CurrencyConverter.countryCodes);
+    creationCountrySelector = new JComboBox(localeSelectorModel);
+    creationPriceField = new JTextField(20);
+    submit = new JButton("Create New");
+  }
+
+  private void createDateFilterComponents() {
+    Calendar cal = Calendar.getInstance();
+    cal.set(1980, 0, 1);
+    Date earliestDate = cal.getTime();
+    Date endDate = model.getEndDate();
+    beginDateSelector = new JSpinner(
+        new javax.swing.SpinnerDateModel(earliestDate, null, endDate, Calendar.DAY_OF_MONTH));
+    endDateSelector = new JSpinner(
+        new javax.swing.SpinnerDateModel(endDate, earliestDate, endDate, Calendar.DAY_OF_MONTH));
+  }
+
+  private void setupList() {
+    listModel = new DefaultListModel<RealEstateSale>();
+    listModel.addAll(model.getSales());
+    salesList = new JList<RealEstateSale>(listModel);
+    salesList.setCellRenderer(new RealEstateSaleListCellRenderer());
+  }
+
+  private void createViewingOptionComponents() {
+    currencyMatchingCheck = new JCheckBox("Convert from local currency");
+    DefaultComboBoxModel<String> localeSelectorModel = new DefaultComboBoxModel();
+    localeSelectorModel.addAll(CurrencyConverter.countryCodes);
+    localeSelector = new JComboBox(localeSelectorModel);
+    localeSelector.setSelectedItem(model.getUserLocale().getCountry());
+    localeSelector.setEditable(false);
+
+    DefaultComboBoxModel<Comparator> sortByModel = new DefaultComboBoxModel(
+        new Comparator[] {new DateComparator(), new PriceComparator(), new CountryComparator()});
+    sortByBox = new JComboBox(sortByModel);
+    sortByBox.setEditable(false);
   }
 
   /**
@@ -120,24 +168,17 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     endDateSelector.addChangeListener(new EndDateListener());
     submit.addActionListener(new EntryCreationListener());
     currencyMatchingCheck.addItemListener(new ConvertAllPricesListener());
+    sortByBox.addItemListener(new SortingListener());
   }
 
   /**
-   * Creates and shapes south views.
+   * Lays out the views in the 'southern' portion of the frame.
    */
   private void setupSouthView() {
-    creationDatePicker = new JSpinner(new javax.swing.SpinnerDateModel(
-          model.getEndDate(), null, model.getEndDate(), Calendar.DAY_OF_MONTH));
-
-    DefaultComboBoxModel<String> localeSelectorModel = new DefaultComboBoxModel();
-    localeSelectorModel.addAll(CurrencyConverter.countryCodes);
-    creationCountrySelector = new JComboBox(localeSelectorModel);
-    creationPriceField = new JTextField(20);
     JPanel southPanel = new JPanel();
     southPanel.add(creationDatePicker);
     southPanel.add(creationPriceField);
     southPanel.add(creationCountrySelector);
-    submit = new JButton("Create New");
     southPanel.add(submit);
 
     add(southPanel, BorderLayout.SOUTH);
@@ -145,22 +186,13 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     
 
   /**
-   * Creates and shapes east views.
+   * Lays out the views in the 'eastern' portion of the frame.
    */
   private void setupEastView() {
-    totalLabel = new JLabel("PLACEHOLDER TEXT");
-
-    Calendar cal = Calendar.getInstance();
-    cal.set(1980, 0, 1);
-    Date earliestDate = cal.getTime();
-    Date endDate = model.getEndDate();
-    beginDateSelector = new JSpinner(
-        new javax.swing.SpinnerDateModel(earliestDate, null, endDate, Calendar.DAY_OF_MONTH));
-    endDateSelector = new JSpinner(
-        new javax.swing.SpinnerDateModel(endDate, earliestDate, endDate, Calendar.DAY_OF_MONTH));
     JPanel spinnerPanel = new JPanel();
     spinnerPanel.add(beginDateSelector);
     spinnerPanel.add(endDateSelector);
+
     JPanel statsPanel = new JPanel();
     statsPanel.setLayout(new BoxLayout(statsPanel, BoxLayout.Y_AXIS));
     statsPanel.add(spinnerPanel);
@@ -170,16 +202,12 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
   }
 
   /**
-   * Creates and shapes center views.
+   * Lays out the views in the 'center' portion of the frame.
    */
   private void setupCenterView() {
-    listModel = new DefaultListModel<RealEstateSale>();
-    listModel.addAll(model.getSales());
-    salesList = new JList<RealEstateSale>(listModel);
-    salesList.setCellRenderer(new RealEstateSaleListCellRenderer());
     
     JPanel optionsPanel = new JPanel();
-    currencyMatchingCheck = new JCheckBox("Convert from local currency");
+    optionsPanel.add(sortByBox);
     optionsPanel.add(currencyMatchingCheck);
 
     JScrollPane scrollPane = new JScrollPane();
@@ -192,12 +220,9 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
   }
 
   /**
-   * Creates and shapes north views.
+   * Lays out the views in the 'northern' portion of the frame.
    */
   private void setupNorthView() {
-    DefaultComboBoxModel<String> localeSelectorModel = new DefaultComboBoxModel();
-    localeSelectorModel.addAll(CurrencyConverter.countryCodes);
-    localeSelector = new JComboBox(localeSelectorModel);
 
     JPanel northPanel = new JPanel();
     northPanel.setLayout(new BoxLayout(northPanel, BoxLayout.Y_AXIS));
@@ -221,6 +246,13 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
   private String formatForLocale(double amount, Locale locale) {
     NumberFormat formatter = NumberFormat.getCurrencyInstance(locale);
     return formatter.format(amount);
+  }
+
+  private void sortListBy(Comparator<RealEstateSale> sortMethod) {
+    java.util.ArrayList<RealEstateSale> tempList = Collections.list(listModel.elements());
+    Collections.sort(tempList, sortMethod);
+    listModel.clear();
+    listModel.addAll(tempList);
   }
 
   /**
@@ -326,7 +358,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
   /**
    * Allows comparison of 'RealEstateSale' instances by their 'Date'.
    */
-  class DateComparator implements java.util.Comparator<RealEstateSale> {
+  class DateComparator implements Comparator<RealEstateSale> {
 
     /**
      * Compares 'RealEstateSale' instances by the values of their respective 'getDate()' methods.
@@ -340,12 +372,16 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     public int compare(RealEstateSale one, RealEstateSale two) {
       return one.getDate().compareTo(two.getDate());
     }
+
+    public String toString() {
+      return "Date";
+    }
   }
 
   /**
    * Allows comparison of 'RealEstateSale' instances by country.
    */
-  class CountryComparator implements java.util.Comparator<RealEstateSale> {
+  class CountryComparator implements Comparator<RealEstateSale> {
 
     /**
      * Compares 'RealEstateSale' instances by the value of their respective 'getCountry()' methods.
@@ -359,12 +395,16 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     public int compare(RealEstateSale one, RealEstateSale two) {
       return one.getCountry().compareTo(two.getCountry());
     }
+
+    public String toString() {
+      return "Country";
+    }
   }
 
   /**
    * Allows comparison of 'RealEstateSale' instances by price.
    */
-  class PriceComparator implements java.util.Comparator<RealEstateSale> {
+  class PriceComparator implements Comparator<RealEstateSale> {
 
     /**
      * Compares 'RealEstateSale' instances by the value of their respective 'getPrice()' methods.
@@ -377,7 +417,11 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
      *     RealEstateSale according to the natural sorting order of those values.
      */
     public int compare(RealEstateSale one, RealEstateSale two) {
-      return (int) (one.getPrice() - two.getPrice());
+      return (int) (model.getConvertedPrice(one) - model.getConvertedPrice(two));
+    }
+
+    public String toString() {
+      return "Price";
     }
   }
 
@@ -391,6 +435,12 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
         renderer = new RealEstateSaleListCellRenderer();
       }
       salesList.setCellRenderer(renderer);
+    }
+  }
+
+  class SortingListener implements ItemListener {
+    public void itemStateChanged(ItemEvent event) {
+      sortListBy((Comparator<RealEstateSale>)sortByBox.getSelectedItem());
     }
   }
 }
