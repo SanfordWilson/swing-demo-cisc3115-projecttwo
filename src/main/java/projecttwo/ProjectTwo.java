@@ -2,6 +2,10 @@ package projecttwo;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Calendar;
@@ -12,6 +16,7 @@ import java.util.Locale;
 import java.util.Observable;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -23,10 +28,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -88,7 +89,6 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     attachListeners();
 
     updateTotalLabel();
-    sortByBox.setSelectedIndex(0);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setSize(800, 500);
     setVisible(true);
@@ -142,6 +142,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
   private void setupList() {
     listModel = new DefaultListModel<RealEstateSale>();
     listModel.addAll(model.getSales());
+    sortListBy(new DateComparator());
     salesList = new JList<RealEstateSale>(listModel);
     salesList.setCellRenderer(new RealEstateSaleListCellRenderer());
   }
@@ -158,6 +159,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
         new Comparator[] {new DateComparator(), new PriceComparator(), new CountryComparator()});
     sortByBox = new JComboBox(sortByModel);
     sortByBox.setEditable(false);
+    sortByBox.setSelectedIndex(0);
   }
 
   /**
@@ -258,7 +260,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
   /**
    * Custom ListCellRenderer for proper display of RealEstateSale values.
    */
-  class RealEstateSaleListCellRenderer extends javax.swing.DefaultListCellRenderer {
+  class RealEstateSaleListCellRenderer extends DefaultListCellRenderer {
 
     /**
      * Formats a cell for proper display of RealEstateSale objects.
@@ -278,14 +280,16 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
         RealEstateSale sale = (RealEstateSale) value;
         String date = dateFormat.format(sale.getDate());
 
-        setText(String.format("%3s | %18s | %15s", sale.getCountry(), date, formatForLocale(sale.getPrice(), sale.getCountry())));
+        setText(String.format("%3s | %18s | %15s", 
+              sale.getCountry(), date, formatForLocale(sale.getPrice(), sale.getCountry())
+              ));
       }
       setFont(new Font("Courier New", Font.PLAIN, 14));
       return this;
     }
   }
 
-  class RealEstateSaleListCellRendererConvertedCurrencies extends javax.swing.DefaultListCellRenderer {
+  class RealEstateSaleListCellRendererConvertedCurrencies extends DefaultListCellRenderer {
 
     public java.awt.Component getListCellRendererComponent(
               JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -294,7 +298,12 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
         RealEstateSale sale = (RealEstateSale) value;
         String date = dateFormat.format(sale.getDate());
 
-        setText(String.format("%3s | %18s | %15s", sale.getCountry(), date, formatForLocale(model.getConvertedPrice(sale), model.getUserLocale())));
+        setText(String.format("%3s | %18s | %15s", 
+               sale.getCountry(), 
+               date, 
+               formatForLocale(model.getConvertedPrice(sale), 
+               model.getUserLocale())
+              ));
       }
       setFont(new Font("Courier New", Font.PLAIN, 14));
       return this;
@@ -428,7 +437,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
   class ConvertAllPricesListener implements ItemListener {
 
     public void itemStateChanged(ItemEvent event) {
-      javax.swing.DefaultListCellRenderer renderer;
+      DefaultListCellRenderer renderer;
       if (event.getStateChange() == ItemEvent.SELECTED) {
         renderer = new RealEstateSaleListCellRendererConvertedCurrencies();
       } else {

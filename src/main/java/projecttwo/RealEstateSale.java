@@ -73,7 +73,9 @@ public class RealEstateSale {
     Calendar cal = Calendar.getInstance();
     cal.setTime(date);
 
-    return make(country, price, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE));
+    return make(
+         country, price, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE)
+        );
   }
 
     
