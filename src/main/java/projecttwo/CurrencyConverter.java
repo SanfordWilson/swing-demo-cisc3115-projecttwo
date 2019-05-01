@@ -19,12 +19,13 @@ public class CurrencyConverter {
   /* intialize countryCodes */
 
   static {
-    String[] locales = {"AD", "AS", "AT", "AX", "BE", "BL", 
-        "BQ", "CA", "CY", "DE", "EC", "EE", "ES", "FI", "FM", 
-        "FR", "GF", "GP", "GR", "GU", "IE", "IO", "IS", "IT", 
-        "LT", "LU", "LV", "MC", "ME", "MF", "MH", "MP", "MQ", 
-        "MT", "NL", "PM", "PR", "PT", "PW", "RE", "SI", "SK", 
-        "SM", "TC", "TF", "TL", "UM", "US", "VA", "VG", "VI", "YT"};
+    String[] locales = {"AD", "AS", "AT", "AX", "BE", "BL", "BQ", "BR", "BV", "CA", "CC", "CH", 
+        "CK", "CN", "CX", "CY", "CZ", "DE", "DK", "EC", "EE", "ES", "FI", "FM", "FO", "FR", "GB", 
+        "GF", "GG", "GL", "GP", "GR", "GS", "GU", "HK", "HM", "HR", "HU", "ID", "IE", "IL", "IM", 
+        "IN", "IO", "IS", "IT", "JE", "JP", "KI", "KR", "LI", "LT", "LU", "LV", "MC", "ME", "MF", 
+        "MH", "MP", "MQ", "MT", "MX", "MY", "NF", "NL", "NO", "NR", "NU", "NZ", "PH", "PL", "PM", 
+        "PN", "PR", "PS", "PT", "PW", "RE", "RO", "SE", "SG", "SI", "SJ", "SK", "SM", "TC", "TF", 
+        "TH", "TL", "TR", "TV", "UM", "US", "VA", "VG", "VI", "YT", "ZA"};
     countryCodes = new ArrayList<String>();
     for (String s : locales) {
       countryCodes.add(s);
@@ -42,7 +43,7 @@ public class CurrencyConverter {
    * @return Currency code corresponding to countryCode.
    */
   public static Currency getCurrency(String countryCode) {
-    Locale l = new Locale("*", countryCode);
+    Locale l = new Locale("", countryCode);
     return Currency.getInstance(l);
   }
 

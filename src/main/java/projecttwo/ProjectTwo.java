@@ -321,7 +321,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
         String date = dateFormat.format(sale.getDate());
 
         setText(String.format("%3s | %18s | %15s", 
-              sale.getCountry(), date, formatForLocale(sale.getPrice(), sale.getCountry())
+              sale.getCountry(), date, formatForLocale(sale.getPrice(), bestLocaleFor(sale.getCountry()))
               ));
       }
       setFont(new Font("Courier New", Font.PLAIN, 14));

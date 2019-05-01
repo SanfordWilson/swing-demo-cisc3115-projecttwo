@@ -122,6 +122,7 @@ public class ProgramModel extends java.util.Observable {
               )
         );
       }
+      updateTotal();
       setChanged();
       notifyObservers(locale);
     }
