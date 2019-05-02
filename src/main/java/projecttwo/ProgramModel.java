@@ -243,6 +243,16 @@ public class ProgramModel extends java.util.Observable {
     return sale;
   }
 
+  /**
+   * Converts a specific sale's price using either historical or contemporary exchange rates.
+   *
+   * <p>If historical conversion fails, provides contemporary conversion.
+   *
+   * @param sale The sale.
+   * @param historical whether to use the exchange rate at the time of sale.
+   *
+   * @return the price of sale converted to the current locale's currency
+   */
   private double convertPrice(RealEstateSale sale, boolean historical) {
     double price = 0.0;
     String currencyCode = CurrencyConverter.getCurrency(userLocale.getCountry()).toString();
@@ -264,6 +274,9 @@ public class ProgramModel extends java.util.Observable {
     return price;
   }
 
+  /**
+   * Generates cache of converted prices of all sales in model.
+   */
   private void generateConvertedPrices() {
     convertedPrices = new HashMap<RealEstateSale, Double>();
     for (RealEstateSale sale : sales) {

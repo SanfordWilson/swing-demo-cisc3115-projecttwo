@@ -91,7 +91,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     updateTotalLabel();
     setDateSpinnerFormats(dateFormat);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    setSize(800, 500);
+    setSize(900, 600);
     setVisible(true);
   }
 
