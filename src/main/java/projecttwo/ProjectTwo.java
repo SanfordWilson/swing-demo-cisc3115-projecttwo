@@ -91,7 +91,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
     updateTotalLabel();
     setDateSpinnerFormats(dateFormat);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    setSize(900, 600);
+    setSize(900, 300);
     setVisible(true);
   }
 
@@ -164,14 +164,14 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
    * Handles instantiation of components involved in setting viewing options for list.
    */
   private void createViewingOptionComponents() {
-    currencyMatchingCheck = new JCheckBox("Convert from local currency:");
+    currencyMatchingCheck = new JCheckBox("Convert from local currency");
     DefaultComboBoxModel<String> localeSelectorModel = new DefaultComboBoxModel();
     localeSelectorModel.addAll(CurrencyConverter.countryCodes);
     localeSelector = new JComboBox(localeSelectorModel);
     localeSelector.setSelectedItem(model.getUserLocale().getCountry());
     localeSelector.setEditable(false);
 
-    historicalCheck = new JCheckBox("Use historical exchange rates when available:");
+    historicalCheck = new JCheckBox("Use historical exchange rates when available");
 
     DefaultComboBoxModel<Comparator> sortByModel = new DefaultComboBoxModel(
         new Comparator[] {new DateComparator(), new PriceComparator(), new CountryComparator()});
@@ -212,7 +212,10 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
    */
   private void setupEastView() {
     JPanel spinnerPanel = new JPanel();
+    spinnerPanel.setLayout(new BoxLayout(spinnerPanel, BoxLayout.Y_AXIS));
+    spinnerPanel.add(new JLabel("Beginning date:"));
     spinnerPanel.add(beginDateSelector);
+    spinnerPanel.add(new JLabel("Ending date:"));
     spinnerPanel.add(endDateSelector);
 
     JPanel statsPanel = new JPanel();
@@ -229,6 +232,7 @@ public final class ProjectTwo extends JFrame implements java.util.Observer {
   private void setupCenterView() {
     
     JPanel optionsPanel = new JPanel();
+    optionsPanel.add(new JLabel("Sort by:"));
     optionsPanel.add(sortByBox);
     optionsPanel.add(currencyMatchingCheck);
 
